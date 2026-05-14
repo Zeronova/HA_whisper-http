@@ -94,13 +94,13 @@ class WhisperHTTPSTTEntity(SpeechToTextEntity):
             "name": f"Whisper HTTP STT ({self._host}:{self._port})",
             "manufacturer": "OpenAI Whisper",
             "model": "faster-whisper",
-            "sw_version": "0.1.1",
+            "sw_version": "0.1.2",
         }
 
     @property
     def supported_languages(self) -> list[str]:
         """Return the list of supported languages."""
-        return list(self._attr_supported_languages)
+        return ["de", "en", "fr", "it", "es", "nl"]
 
     async def async_process_audio_stream(
         self, source: AsyncIterable[bytes], language: str | None = None
