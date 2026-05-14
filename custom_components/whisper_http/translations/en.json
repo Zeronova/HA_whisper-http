@@ -1,0 +1,29 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Whisper HTTP STT",
+        "description": "Connect to a local Whisper HTTP server (OpenAI-compatible API).",
+        "data": {
+          "host": "Server host",
+          "port": "Server port"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This server is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Whisper HTTP STT Options",
+        "description": "Configure transcription model and language.",
+        "data": {
+          "model": "Whisper model",
+          "language": "Default language"
+        }
+      }
+    }
+  }
+}

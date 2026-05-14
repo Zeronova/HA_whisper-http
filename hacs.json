@@ -1,0 +1,8 @@
+{
+  "name": "Whisper HTTP STT",
+  "render_readme": true,
+  "homeassistant": "2026.4.0",
+  "country": "DE",
+  "domains": ["stt"],
+  "iot_class": "local_polling"
+}
