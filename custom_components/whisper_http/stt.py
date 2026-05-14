@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import io
 import logging
+import wave
 from typing import AsyncIterable
 
 from aiohttp import FormData
@@ -97,13 +99,37 @@ class WhisperHTTPSTTEntity(SpeechToTextEntity):
             "name": f"Whisper HTTP STT ({self._host}:{self._port})",
             "manufacturer": "OpenAI Whisper",
             "model": "faster-whisper",
-            "sw_version": "0.1.3",
+            "sw_version": "0.1.4",
         }
 
     @property
     def supported_languages(self) -> list[str]:
         """Return the list of supported languages."""
         return ["de", "en", "fr", "it", "es", "nl"]
+
+    @staticmethod
+    def _ensure_wav(audio_data: bytes) -> bytes:
+        """Wrap raw PCM bytes in a WAV container if not already WAV.
+
+        HA 2026.4+ may deliver raw PCM without a WAV header when the
+        integration declares PCM codec support. Whisper's ffmpeg processing
+        requires a valid WAV container.
+        """
+        if audio_data[:4] == b"RIFF":
+            return audio_data  # Already has WAV header
+        buf = io.BytesIO()
+        with wave.open(buf, "wb") as wav:
+            wav.setnchannels(1)
+            wav.setsampwidth(2)  # 16 bit = 2 bytes
+            wav.setframerate(16000)
+            wav.writeframes(audio_data)
+        wrapped = buf.getvalue()
+        _LOGGER.debug(
+            "Wrapped raw PCM (%d bytes) in WAV container (%d bytes)",
+            len(audio_data),
+            len(wrapped),
+        )
+        return wrapped
 
     async def async_process_audio_stream(
         self, metadata: SpeechMetadata, stream: AsyncIterable[bytes]
@@ -124,6 +150,9 @@ class WhisperHTTPSTTEntity(SpeechToTextEntity):
             return SpeechResult(text=None, result=SpeechResultState.ERROR)
 
         _LOGGER.debug("Received %d bytes of audio for transcription", len(audio_data))
+
+        # HA 2026.4+ may deliver raw PCM — ensure valid WAV container
+        audio_data = self._ensure_wav(audio_data)
 
         model = self._config_entry.options.get(CONF_MODEL, self._model)
         lang = metadata.language or self._language
