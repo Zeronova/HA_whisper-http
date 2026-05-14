@@ -36,7 +36,7 @@ Copy the `custom_components/whisper_http/` directory to your HA `custom_componen
 
 1. Go to Settings → Devices & Services → Add Integration
 2. Search for "Whisper HTTP STT"
-3. Enter your Whisper server host and port (default: `192.168.2.7:9000`)
+3. Enter your Whisper server host and port (default: `localhost:9000`)
 4. Configure model and default language in Options
 
 ## Usage

@@ -7,7 +7,7 @@ CONF_PORT = "port"
 CONF_MODEL = "model"
 CONF_LANGUAGE = "language"
 
-DEFAULT_HOST = "192.168.2.7"
+DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 9000
 DEFAULT_MODEL = "small"
 DEFAULT_LANGUAGE = "de"
