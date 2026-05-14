@@ -12,14 +12,11 @@ from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 
 from .const import (
-    AVAILABLE_MODELS,
     CONF_HOST,
     CONF_LANGUAGE,
-    CONF_MODEL,
     CONF_PORT,
     DEFAULT_HOST,
     DEFAULT_LANGUAGE,
-    DEFAULT_MODEL,
     DEFAULT_PORT,
     DOMAIN,
     SUPPORTED_LANGUAGES,
@@ -53,7 +50,6 @@ class WhisperHTTPConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     CONF_PORT: port,
                 },
                 options={
-                    CONF_MODEL: DEFAULT_MODEL,
                     CONF_LANGUAGE: DEFAULT_LANGUAGE,
                 },
             )
@@ -81,17 +77,10 @@ class WhisperHTTPOptionsFlow(config_entries.OptionsFlow):
         """Handle the options step."""
         _LOGGER.warning("async_step_init called")
 
-        current_model = self.config_entry.options.get(CONF_MODEL, DEFAULT_MODEL)
         current_language = self.config_entry.options.get(CONF_LANGUAGE, DEFAULT_LANGUAGE)
-
-        # Build model choices dict
-        models_dict: dict[str, str] = {m: m for m in AVAILABLE_MODELS}
-        if current_model not in AVAILABLE_MODELS:
-            models_dict[current_model] = current_model
 
         schema = vol.Schema(
             {
-                vol.Optional(CONF_MODEL, default=current_model): vol.In(models_dict),
                 vol.Optional(CONF_LANGUAGE, default=current_language): vol.In(
                     SUPPORTED_LANGUAGES
                 ),

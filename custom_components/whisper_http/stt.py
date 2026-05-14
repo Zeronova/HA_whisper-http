@@ -27,10 +27,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .const import (
     CONF_HOST,
     CONF_LANGUAGE,
-    CONF_MODEL,
     CONF_PORT,
     DEFAULT_LANGUAGE,
-    DEFAULT_MODEL,
     DOMAIN,
     ENDPOINT_TRANSCRIBE,
 )
@@ -89,9 +87,7 @@ class WhisperHTTPSTTEntity(SpeechToTextEntity):
         self._host = config_entry.data[CONF_HOST]
         self._port = config_entry.data[CONF_PORT]
         self._base_url = f"http://{self._host}:{self._port}"
-        model = config_entry.options.get(CONF_MODEL) or config_entry.data.get(CONF_MODEL, DEFAULT_MODEL)
         language = config_entry.options.get(CONF_LANGUAGE) or config_entry.data.get(CONF_LANGUAGE, DEFAULT_LANGUAGE)
-        self._model = model
         self._language = language
         self._attr_unique_id = f"{self._host}_{self._port}"
         self._attr_device_info = {
@@ -99,7 +95,7 @@ class WhisperHTTPSTTEntity(SpeechToTextEntity):
             "name": f"Whisper HTTP STT ({self._host}:{self._port})",
             "manufacturer": "OpenAI Whisper",
             "model": "faster-whisper",
-            "sw_version": "0.1.4",
+            "sw_version": "0.1.5",
         }
 
     @property
@@ -154,7 +150,6 @@ class WhisperHTTPSTTEntity(SpeechToTextEntity):
         # HA 2026.4+ may deliver raw PCM — ensure valid WAV container
         audio_data = self._ensure_wav(audio_data)
 
-        model = self._config_entry.options.get(CONF_MODEL, self._model)
         lang = metadata.language or self._language
 
         url = f"{self._base_url}{ENDPOINT_TRANSCRIBE}"
@@ -170,13 +165,12 @@ class WhisperHTTPSTTEntity(SpeechToTextEntity):
                 filename="audio.wav",
                 content_type="audio/wav",
             )
-            form.add_field("model", model)
             form.add_field("language", lang)
             form.add_field("response_format", "json")
 
             _LOGGER.debug(
-                "Sending request to %s (model=%s, lang=%s, bytes=%d)",
-                url, model, lang, len(audio_data),
+                "Sending request to %s (lang=%s, bytes=%d)",
+                url, lang, len(audio_data),
             )
 
             async with session.post(url, data=form) as resp:

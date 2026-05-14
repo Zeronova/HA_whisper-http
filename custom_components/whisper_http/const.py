@@ -9,7 +9,6 @@ CONF_LANGUAGE = "language"
 
 DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 9000
-DEFAULT_MODEL = "small"
 DEFAULT_LANGUAGE = "de"
 
 ENDPOINT_MODELS = "/v1/models"
@@ -23,10 +22,3 @@ SUPPORTED_LANGUAGES = {
     "es": "Español",
     "nl": "Nederlands",
 }
-
-AVAILABLE_MODELS = [
-    "small",
-    "medium",
-    "large",
-    "large-v3",
-]
