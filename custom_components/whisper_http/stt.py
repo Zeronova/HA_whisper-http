@@ -12,6 +12,9 @@ from homeassistant.components.stt import (
     AudioCodecs,
     AudioFormats,
     AudioSampleRates,
+    SpeechMetadata,
+    SpeechResult,
+    SpeechResultState,
     SpeechToTextEntity,
 )
 from homeassistant.config_entries import ConfigEntry
@@ -94,7 +97,7 @@ class WhisperHTTPSTTEntity(SpeechToTextEntity):
             "name": f"Whisper HTTP STT ({self._host}:{self._port})",
             "manufacturer": "OpenAI Whisper",
             "model": "faster-whisper",
-            "sw_version": "0.1.2",
+            "sw_version": "0.1.3",
         }
 
     @property
@@ -103,26 +106,27 @@ class WhisperHTTPSTTEntity(SpeechToTextEntity):
         return ["de", "en", "fr", "it", "es", "nl"]
 
     async def async_process_audio_stream(
-        self, source: AsyncIterable[bytes], language: str | None = None
-    ) -> str:
+        self, metadata: SpeechMetadata, stream: AsyncIterable[bytes]
+    ) -> SpeechResult:
         """Process an audio stream to text via the Whisper REST API.
 
-        source: async iterable yielding chunks of audio bytes (WAV PCM 16kHz 16bit).
-        language: optional language hint (e.g. "de", "en").
-        Returns the transcribed text (empty string on error).
+        metadata: SpeechMetadata containing language, format, codec, bit_rate,
+                  sample_rate, and channel.
+        stream: async iterable yielding chunks of audio bytes (WAV PCM 16kHz 16bit).
+        Returns a SpeechResult with the transcribed text on success.
         """
         audio_data = b""
-        async for chunk in source:
+        async for chunk in stream:
             audio_data += chunk
 
         if not audio_data:
             _LOGGER.error("Empty audio stream received")
-            return ""
+            return SpeechResult(text=None, result=SpeechResultState.ERROR)
 
         _LOGGER.debug("Received %d bytes of audio for transcription", len(audio_data))
 
         model = self._config_entry.options.get(CONF_MODEL, self._model)
-        lang = language or self._language
+        lang = metadata.language or self._language
 
         url = f"{self._base_url}{ENDPOINT_TRANSCRIBE}"
 
@@ -152,15 +156,15 @@ class WhisperHTTPSTTEntity(SpeechToTextEntity):
                     _LOGGER.error(
                         "Whisper HTTP returned %s: %s", resp.status, error_text
                     )
-                    return ""
+                    return SpeechResult(text=None, result=SpeechResultState.ERROR)
 
                 result_json = await resp.json()
                 text = result_json.get("text", "")
                 _LOGGER.debug(
                     "Transcription result (%d chars): %s", len(text), text[:100]
                 )
-                return text
+                return SpeechResult(text=text, result=SpeechResultState.SUCCESS)
 
         except Exception as err:
             _LOGGER.error("Error during transcription: %s", err)
-            return ""
+            return SpeechResult(text=None, result=SpeechResultState.ERROR)
