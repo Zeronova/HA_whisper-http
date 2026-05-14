@@ -8,6 +8,7 @@ from typing import AsyncIterable
 from aiohttp import FormData
 from homeassistant.components.stt import (
     AudioBitRates,
+    AudioChannels,
     AudioCodecs,
     AudioFormats,
     AudioSampleRates,
@@ -49,11 +50,31 @@ class WhisperHTTPSTTEntity(SpeechToTextEntity):
     _attr_has_entity_name = True
 
     # Whisper works best with 16kHz 16bit mono PCM WAV
-    _attr_supported_formats = [AudioFormats.WAV]
-    _attr_supported_codecs = [AudioCodecs.PCM]
-    _attr_supported_bit_rates = [AudioBitRates.BITRATE_16]
-    _attr_supported_sample_rates = [AudioSampleRates.SAMPLERATE_16000]
-    _attr_supported_languages = ["de", "en", "fr", "it", "es", "nl"]
+
+    @property
+    def supported_formats(self) -> list[AudioFormats]:
+        """Return list of supported audio formats."""
+        return [AudioFormats.WAV]
+
+    @property
+    def supported_codecs(self) -> list[AudioCodecs]:
+        """Return list of supported audio codecs."""
+        return [AudioCodecs.PCM]
+
+    @property
+    def supported_bit_rates(self) -> list[AudioBitRates]:
+        """Return list of supported audio bit rates."""
+        return [AudioBitRates.BITRATE_16]
+
+    @property
+    def supported_sample_rates(self) -> list[AudioSampleRates]:
+        """Return list of supported audio sample rates."""
+        return [AudioSampleRates.SAMPLERATE_16000]
+
+    @property
+    def supported_channels(self) -> list[AudioChannels]:
+        """Return list of supported audio channels."""
+        return [AudioChannels.CHANNEL_MONO]
 
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize the Whisper HTTP STT entity."""
@@ -73,7 +94,7 @@ class WhisperHTTPSTTEntity(SpeechToTextEntity):
             "name": f"Whisper HTTP STT ({self._host}:{self._port})",
             "manufacturer": "OpenAI Whisper",
             "model": "faster-whisper",
-            "sw_version": "0.1.0",
+            "sw_version": "0.1.1",
         }
 
     @property
