@@ -20,9 +20,3 @@ Home Assistant STT-Plattform für lokale Spracherkennung via [Whisper Server](ht
 1. **Integration hinzufügen:** Einstellungen → Geräte & Dienste → Integration hinzufügen → "Whisper HTTP"
 2. **Host und Port** des Whisper-Servers angeben
 3. **Assistent einrichten:** Einstellungen → Sprachassistenten → Assist → Sprache-zu-Text → "Whisper HTTP" auswählen
-
-| Option | Standard | Beschreibung |
-|--------|----------|-------------|
-| Host | `192.168.2.7` | Whisper-Server-Host |
-| Port | `9000` | Whisper-Server-Port |
-| Language | `de` | Erkennungssprache |
