@@ -1,46 +1,28 @@
-# HA_whisper-http
+# Whisper HTTP STT für Home Assistant
 
-**Home Assistant custom integration** for local Whisper speech-to-text via HTTP API.
-
-Uses an OpenAI-compatible Whisper REST API (e.g. faster-whisper) as the STT provider for Home Assistant Assist pipelines.
-
-## Features
-
-- Connects to any OpenAI-compatible Whisper API (`/v1/audio/transcriptions`)
-- Configurable model and language
-- Config flow + options flow (no YAML needed)
-- Supports HA Assist voice pipelines
-
-## Requirements
-
-- A running Whisper HTTP server supporting the OpenAI API format
-  (e.g. `ahmetoner/whisper-asr-webservice` or a custom faster-whisper REST API)
-- Home Assistant 2026.4+ (may work with earlier versions, untested)
+Home Assistant STT-Plattform für lokale Spracherkennung via [Whisper Server](https://github.com/hwdsl2/whisper-server) (OpenAI-kompatible API).
 
 ## Installation
 
-### Via HACS (recommended)
+### Via HACS (empfohlen)
 
-1. Add this repository to HACS as a custom integration:
-   - HACS → Integrations → ⋮ → Custom repositories
-   - Repository: `https://github.com/Zeronova/HA_whisper-http`
-   - Category: Integration
-2. Download the integration
-3. Restart Home Assistant
+1. HACS → Custom Repositories → `https://github.com/zeronova/HA_whisper-http` (Typ: Integration)
+2. HACS → Integrationen → "Whisper HTTP" installieren
+3. HA neu starten
 
-### Manual
+### Manuell
 
-Copy the `custom_components/whisper_http/` directory to your HA `custom_components/` directory and restart Home Assistant.
+1. Ordner `whisper_http` nach `custom_components/whisper_http` kopieren
+2. HA neu starten
 
-## Configuration
+## Konfiguration
 
-1. Go to Settings → Devices & Services → Add Integration
-2. Search for "Whisper HTTP STT"
-3. Enter your Whisper server host and port (default: `localhost:9000`)
-4. Configure model and default language in Options
+1. **Integration hinzufügen:** Einstellungen → Geräte & Dienste → Integration hinzufügen → "Whisper HTTP"
+2. **Host und Port** des Whisper-Servers angeben
+3. **Assistent einrichten:** Einstellungen → Sprachassistenten → Assist → Sprache-zu-Text → "Whisper HTTP" auswählen
 
-## Usage
-
-After configuration, the STT entity `stt.whisper_http` appears and can be selected in Assist pipelines:
-
-Settings → Voice Assistants → [Your Assistant] → Speech-to-text → Whisper HTTP STT
+| Option | Standard | Beschreibung |
+|--------|----------|-------------|
+| Host | `192.168.2.7` | Whisper-Server-Host |
+| Port | `9000` | Whisper-Server-Port |
+| Language | `de` | Erkennungssprache |
