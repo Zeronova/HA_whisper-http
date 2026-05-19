@@ -15,7 +15,7 @@ PLATFORMS = [Platform.STT]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Whisper HTTP STT from a config entry."""
-    _LOGGER.warning("async_setup_entry called for entry %s", entry.entry_id)
+    _LOGGER.debug("async_setup_entry called for entry %s", entry.entry_id)
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = entry.data | entry.options
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -27,7 +27,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Handle options update — reload STT entity."""
-    _LOGGER.warning("async_update_listener: reloading STT for entry %s", entry.entry_id)
+    _LOGGER.debug("async_update_listener: reloading STT for entry %s", entry.entry_id)
     await hass.config_entries.async_reload(entry.entry_id)
 
 

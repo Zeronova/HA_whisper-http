@@ -1,29 +1,16 @@
 {
-  "config": {
-    "step": {
-      "user": {
-        "title": "Whisper HTTP STT",
-        "description": "Mit einem lokalen Whisper HTTP-Server verbinden (OpenAI-kompatible API).",
-        "data": {
-          "host": "Server-Adresse",
-          "port": "Server-Port"
+    "config": {
+        "step": {
+            "user": {
+                "title": "Whisper HTTP STT konfigurieren",
+                "data": {
+                    "host": "Server-Host",
+                    "port": "Server-Port"
+                }
+            }
+        },
+        "error": {
+            "cannot_connect": "Verbindung zum Whisper-Server fehlgeschlagen"
         }
-      }
-    },
-    "abort": {
-      "already_configured": "Dieser Server ist bereits konfiguriert."
     }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Whisper HTTP STT Optionen",
-        "description": "Transkriptionsmodell und Sprache konfigurieren.",
-        "data": {
-          "model": "Whisper-Modell",
-          "language": "Standardsprache"
-        }
-      }
-    }
-  }
 }

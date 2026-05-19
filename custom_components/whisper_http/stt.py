@@ -42,7 +42,6 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up Whisper HTTP STT entities."""
-    _LOGGER.warning("STT async_setup_entry called")
     async_add_entities([WhisperHTTPSTTEntity(config_entry)])
 
 
@@ -82,7 +81,6 @@ class WhisperHTTPSTTEntity(SpeechToTextEntity):
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize the Whisper HTTP STT entity."""
         super().__init__()
-        _LOGGER.warning("WhisperHTTPSTTEntity.__init__")
         self._config_entry = config_entry
         self._host = config_entry.data[CONF_HOST]
         self._port = config_entry.data[CONF_PORT]

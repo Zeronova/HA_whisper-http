@@ -30,29 +30,40 @@ class WhisperHTTPConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
+    async def _try_connect(self, host: str, port: int) -> bool:
+        """Test if the Whisper server is reachable."""
+        from homeassistant.helpers.aiohttp_client import async_get_clientsession
+
+        session = async_get_clientsession(self.hass)
+        url = f"http://{host}:{port}/v1/models"
+        try:
+            async with session.get(url, timeout=5) as resp:
+                return resp.status == 200
+        except Exception:
+            return False
+
     async def async_step_user(self, user_input: dict[str, Any] | None = None):
         """Handle the initial step."""
         errors = {}
         if user_input is not None:
-            _LOGGER.warning(
-                "Config flow step_user: host=%s port=%s",
-                user_input.get(CONF_HOST),
-                user_input.get(CONF_PORT),
-            )
             host = user_input[CONF_HOST]
             port = user_input[CONF_PORT]
-            await self.async_set_unique_id(f"{host}_{port}")
-            self._abort_if_unique_id_configured()
-            return self.async_create_entry(
-                title=f"{host}:{port}",
-                data={
-                    CONF_HOST: host,
-                    CONF_PORT: port,
-                },
-                options={
-                    CONF_LANGUAGE: DEFAULT_LANGUAGE,
-                },
-            )
+
+            if not await self._try_connect(host, port):
+                errors["base"] = "cannot_connect"
+            else:
+                await self.async_set_unique_id(f"{host}_{port}")
+                self._abort_if_unique_id_configured()
+                return self.async_create_entry(
+                    title=f"{host}:{port}",
+                    data={
+                        CONF_HOST: host,
+                        CONF_PORT: port,
+                    },
+                    options={
+                        CONF_LANGUAGE: DEFAULT_LANGUAGE,
+                    },
+                )
 
         schema = vol.Schema(
             {
@@ -66,7 +77,6 @@ class WhisperHTTPConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(config_entry):
         """Create the options flow."""
-        _LOGGER.warning("async_get_options_flow called")
         return WhisperHTTPOptionsFlow()
 
 
@@ -75,7 +85,6 @@ class WhisperHTTPOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None):
         """Handle the options step."""
-        _LOGGER.warning("async_step_init called")
 
         current_language = self.config_entry.options.get(CONF_LANGUAGE, DEFAULT_LANGUAGE)
 
@@ -88,7 +97,6 @@ class WhisperHTTPOptionsFlow(config_entries.OptionsFlow):
         )
 
         if user_input is not None:
-            _LOGGER.warning("user_input=%s", user_input)
             return self.async_create_entry(title="", data=user_input)
 
         return self.async_show_form(step_id="init", data_schema=schema)
